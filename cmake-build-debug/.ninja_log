@@ -1,0 +1,9 @@
+# ninja log v6
+1	234	1731609069031530319	CMakeFiles/kurvaPalindrom.dir/main.c.o	460edd3d4dafe9e
+234	352	1731609069264090503	kurvaPalindrom	c1396aaad37cc7f1
+2	231	1731609215778903115	CMakeFiles/kurvaPalindrom.dir/main.c.o	460edd3d4dafe9e
+231	355	1731609216008119732	kurvaPalindrom	c1396aaad37cc7f1
+3	210	1731609435449853272	CMakeFiles/kurvaPalindrom.dir/main.c.o	460edd3d4dafe9e
+210	331	1731609435656630539	kurvaPalindrom	c1396aaad37cc7f1
+2	175	1731609483608479615	CMakeFiles/kurvaPalindrom.dir/main.c.o	460edd3d4dafe9e
+175	275	1731609483781544253	kurvaPalindrom	c1396aaad37cc7f1
