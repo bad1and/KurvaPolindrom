@@ -28,32 +28,49 @@ void findPalindromes(const char *str) {
     clear();
     mvprintw(1, 0, "Любая кнопка - редактировать");
     int found = 0;
-    if (isPalindrome(str, 0, len - 1) && strlen(str)>1) {
+    int maxLength = 0;         // Длина самого длинного палиндрома
+    int maxStart = -1;         // Начало самого длинного палиндрома
+
+    if (isPalindrome(str, 0, len - 1) && strlen(str) > 1) {
         mvprintw(2, 0, "Вся строка является палиндромом.");
     } else {
         mvprintw(2, 0, "Вся строка не является палиндромом.");
     }
 
-    if (strlen(str)>0) {
+    if (strlen(str) > 0) {
         mvprintw(4, 0, "Найденные подпалиндромы и их длины:");
-
 
         for (int i = 0; i < len; i++) {
             for (int j = i + 1; j < len; j++) {
                 if (isPalindrome(str, i, j)) {
                     int length = j - i + 1;
+
+                    // Проверяем на самый длинный
+                    if (length > maxLength) {
+                        maxLength = length;
+                        maxStart = i;
+                    }
+
                     if (length > 1) {
                         char temp[length + 1];
                         strncpy(temp, &str[i], length);
                         temp[length] = '\0';
-                        mvprintw(found + 6, 0, "Палиндром: %s, Длина: %d", temp, length);
+                        mvprintw(found + 7, 0, "Палиндром: %s, Длина: %d", temp, length);
                         found++;
                     }
                 }
             }
         }
 
+        // Вывод самого длинного
+        if (maxLength > 0 && maxStart != -1) {
+            char longest[maxLength + 1];
+            strncpy(longest, &str[maxStart], maxLength);
+            longest[maxLength] = '\0';
+            mvprintw(5, 0, "Самый длинный палиндром: %s, Длина: %d", longest, maxLength);
+        }
     }
+
     if (found == 0) {
         mvprintw(6, 0, "Палиндромы не найдены.");
     }
@@ -177,3 +194,5 @@ int main() {
     endwin();
     return 0;
 }
+
+
