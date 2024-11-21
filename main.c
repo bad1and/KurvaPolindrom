@@ -12,110 +12,128 @@ int key;
 int PosX = 0;
 char lastMaze[HEIGHT][WIDTH];
 
-//чек на палиндром
+// Проверка на палиндром
 bool isPalindrome(const char *str, int start, int end) {
     while (start < end) {
-        // Пропуск пробелов и символов '_'
-        if (str[start] == ' ' || str[start] == '_') {
-            start++;
-            continue;
-        }
-        if (str[end] == ' ' || str[end] == '_') {
-            end--;
-            continue;
-        }
-        // Сравнение символов
         if (str[start] != str[end]) return false;
         start++;
         end--;
     }
-    return true; // палиндром
+    return true;
 }
 
-// два цикла поиск
+// Поиск всех палиндромов
 void findPalindromes(const char *str) {
     int len = strlen(str);
     clear();
-    mvprintw(0, 0, "Найденные палиндромы и их длины:");
+    mvprintw(1, 0, "Любая кнопка - редактировать");
     int found = 0;
+    if (isPalindrome(str, 0, len - 1) && strlen(str)>1) {
+        mvprintw(2, 0, "Вся строка является палиндромом.");
+    } else {
+        mvprintw(2, 0, "Вся строка не является палиндромом.");
+    }
 
-    for (int i = 0; i < len; i++) {
-        for (int j = i + 1; j < len; j++) { // длина палика > 1
-            if (isPalindrome(str, i, j)) {
-                int length = j - i + 1;
-                if (length > 1) {
-                    char temp[length + 1];
-                    int k = 0;
-                    for (int p = i; p <= j; p++) {
-                        if (str[p] != '_') {
-                            temp[k++] = str[p];
-                        }
-                    }
-                    temp[k] = '\0';
-                    if (k>1) {
-                        mvprintw(found + 1, 0, "Палиндром: %s, Длина: %d", temp, k);
+    if (strlen(str)>0) {
+        mvprintw(4, 0, "Найденные подпалиндромы и их длины:");
+
+
+        for (int i = 0; i < len; i++) {
+            for (int j = i + 1; j < len; j++) {
+                if (isPalindrome(str, i, j)) {
+                    int length = j - i + 1;
+                    if (length > 1) {
+                        char temp[length + 1];
+                        strncpy(temp, &str[i], length);
+                        temp[length] = '\0';
+                        mvprintw(found + 6, 0, "Палиндром: %s, Длина: %d", temp, length);
                         found++;
                     }
                 }
-                break;
             }
         }
+
     }
     if (found == 0) {
-        mvprintw(1, 0, "Палиндромы не найдены.");
+        mvprintw(6, 0, "Палиндромы не найдены.");
     }
+
     refresh();
     getch();
 }
 
+// матрица в строку
+void matrixToString(int width, int height, char maze[height][width], char *result) {
+    int index = 0;
+    for (int x = 0; x < width; x++) {
+        if (maze[0][x] != ' ') { // скип пробелов
+            result[index++] = maze[0][x];
+        }
+    }
+    result[index] = '\0';
+}
+
+// Отрисовка основной матрицы
 void drawmain(int width, int height, char maze[height][width], int PosX, int PosY) {
     clear();
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             if (x == PosX && y == PosY) {
-                mvaddch(y, x, '$');
+                mvaddch(y, x, '|');
             } else {
                 mvaddch(y, x, maze[y][x]);
+
             }
         }
     }
+
     refresh();
+    printw("\nOnly english");
+    printw("\nВниз - получить палиндромы");
+
 }
 
+// Обработка нажатий клавиш
 void keywork(int width, int height, char maze[height][width]) {
     key = getch();
 
-    if (key >= 32 && key <= 126) { // Печатаемые символы
-        maze[0][PosX] = key;
+    if (key >= 32 && key <= 126) {
+        if (maze[0][PosX] == ' ') {
+            // символ в пустое место
+            maze[0][PosX] = key;
+        } else {
+            // сдвиг вправо
+            for (int i = width - 1; i > PosX; i--) {
+                maze[0][i] = maze[0][i - 1];
+            }
+            maze[0][PosX] = key;
+        }
         if (PosX < width - 1) PosX++;
     } else if (key == 127 || key == KEY_BACKSPACE) {
         if (PosX > 0) {
+            for (int i = PosX - 1; i < width - 1; i++) {
+                maze[0][i] = maze[0][i + 1];
+            }
+            maze[0][width - 1] = ' ';
             PosX--;
-            maze[0][PosX] = '_';
         }
-    } else if (key == KEY_LEFT) {
+    } else if (key == KEY_LEFT) { // Влево
         if (PosX > 0) PosX--;
-    } else if (key == KEY_RIGHT) {
+    } else if (key == KEY_RIGHT) { // Вправо
         if (PosX < width - 1) PosX++;
     }
 }
 
+// Инициализация матрицы
 void createlab(int width, int height, char maze[height][width]) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            maze[y][x] = '_';
+            maze[y][x] = ' ';
         }
     }
 }
 
-void matrixToString(int width, int height, char maze[height][width], char *result) {
-    int index = 0;
-    for (int x = 0; x < width; x++) {
-        result[index++] = maze[0][x];
-    }
-    result[index] = '\0';
-}
-
+// Копирование матрицы
 void copyMaze(int width, int height, char source[height][width], char target[height][width]) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
@@ -123,6 +141,8 @@ void copyMaze(int width, int height, char source[height][width], char target[hei
         }
     }
 }
+
+
 
 int main() {
     setlocale(LC_ALL, "");
